@@ -29,7 +29,6 @@
       padding:36px 0 80px;
     }
 
-    /* overlay grunge */
     .overlay{
       position:fixed;
       inset:0;
@@ -38,7 +37,6 @@
       mix-blend-mode:multiply;
     }
 
-    /* header styling matches deadman site */
     header{
       display:flex;
       align-items:flex-end;
@@ -161,18 +159,32 @@
     }
     .progress .bar{height:100%;width:0%;background:linear-gradient(90deg,var(--accent),#f3a97b)}
 
-    .lyrics{
+    /* ===== LYRICS ===== */
+    .lyrics {
       margin-top:20px;
-      background:rgba(0,0,0,0.55);
-      padding:16px;
-      border-radius:8px;
-      max-height:300px;
-      overflow:auto;
-      border:1px solid rgba(255,255,255,0.03);
-      color:#ddd;
-      font-family:'Merriweather', serif;
-      line-height:1.5;
-      white-space:pre-wrap;
+      background: rgba(15, 15, 15, 0.7);
+      padding: 18px;
+      border-radius: 10px;
+      max-height: 300px;
+      overflow-y: auto;
+      border: 1px solid rgba(255,255,255,0.04);
+      color: #eee;
+      font-family: 'Special Elite', monospace;
+      font-size: 15px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      box-shadow: inset 0 4px 15px rgba(0,0,0,0.4);
+    }
+    .lyrics::-webkit-scrollbar {
+      width: 10px;
+    }
+    .lyrics::-webkit-scrollbar-thumb {
+      background: rgba(64, 56, 56, 0.5);
+      border-radius: 6px;
+      border: 2px solid rgba(0,0,0,0.1);
+    }
+    .lyrics::-webkit-scrollbar-track {
+      background: transparent;
     }
 
     .playlist{
@@ -195,21 +207,23 @@
     .track .tmeta .tt{font-weight:700}
     .track .tmeta .ta{font-size:13px;color:var(--muted)}
 
+    /* ===== NOTES (CRUMPLED PAPER) ===== */
     aside .notes{
-      background:var(--paper);
-      color:#111;
-      padding:18px;
-      border-radius:10px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.55);
+      background: url('https://i.pinimg.com/736x/d5/6f/c5/d56fc585a8b5b2d033c0db80e23eefda.jpg') no-repeat center center;
+      background-size: cover;
+      color: #1a1a1a;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: inset 0 6px 20px rgba(0,0,0,0.3), 0 6px 18px rgba(0,0,0,0.4);
       height:520px;
-      overflow:auto;
-      position:sticky;
-      top:40px;
-      border:2px solid rgba(0,0,0,0.08);
-      background-image: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02)), var(--grain);
-      font-family:'Special Elite', cursive;
-      line-height:1.5;
-      white-space:pre-wrap;
+      overflow-y:auto;
+      position: sticky;
+      top: 40px;
+      font-family:'Special Elite', monospace;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      border: 2px solid rgba(0,0,0,0.1);
+      transform: rotate(-0.5deg);
     }
 
     footer{
@@ -225,6 +239,7 @@
       aside .notes{position:relative;height:320px}
       .album-cover{width:120px;height:120px}
       .cassette{max-width:100%}
+      .lyrics { max-height: 220px; }
     }
   </style>
 </head>
@@ -259,7 +274,7 @@
       </div>
 
       <div class="lyrics" id="lyrics">
-        <pre id="lyricsText" style="margin:0;color:#ddd;white-space:pre-wrap;">Select a track to see lyrics.</pre>
+        <pre id="lyricsText" style="margin:0;color:#eee;white-space:pre-wrap;">Select a track to see lyrics.</pre>
       </div>
 
       <div class="playlist" id="playlist"></div>
@@ -280,7 +295,6 @@
   <audio id="audio" preload="metadata"></audio>
 
   <script>
-    /* ====== PLAYLIST LOGIC SAME AS BEFORE ====== */
     const songs = [
       {
         title: "Hold On",
@@ -337,9 +351,8 @@ Said hold on, can't stop
 Said hold on, can't stop
 Said hold on, can't stop`,
         notes: `this is the song i was listening to when i realized oh fuck. I am so cooked. I like her a lot more than i thought i would. i also really wanted to get- yk. withdrawls and shit. But this song made me think yk what, maybe i'll make a playlist for her.
-        I thought yeah nah she wont like this song, but fuck it. Its the song that started this playlist, and so it shall remain in this mixtape.`
-      },
-      // add more tracks here
+I thought yeah nah she wont like this song, but fuck it. Its the song that started this playlist, and so it shall remain in this mixtape.`
+      }
     ];
 
     const audio = document.getElementById('audio');
