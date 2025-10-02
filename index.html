@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>rahhh mixtape time</title>
+  <meta name="description" content="alvii — a grungy mixtape site" />
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg-url: url("https://i.pinimg.com/736x/68/4f/5c/684f5cb69e56ab8b140e89dca9cdc730.jpg");
+      --accent: #c84b31;
+      --muted: #bdbdbd;
+      --paper: #f6f0e6;
+      --grain: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><filter id="n"><feTurbulence baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23n)" opacity="0.02" fill="black"/></svg>');
+    }
+
+    html,body{height:100%;margin:0;background:#0b0b0b;color:#eee;font-family:'Merriweather', serif;}
+    body{
+      background-image: var(--bg-url);
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      position:relative;
+      overflow:auto;
+      padding:36px 0 80px;
+    }
+
+    /* overlay grunge */
+    .overlay{
+      position:fixed;
+      inset:0;
+      background:linear-gradient(180deg, rgba(0,0,0,0.55), rgba(0,0,0,0.7));
+      pointer-events:none;
+      mix-blend-mode:multiply;
+    }
+
+    /* header styling matches deadman site */
+    header{
+      display:flex;
+      align-items:flex-end;
+      gap:18px;
+      margin-bottom:28px;
+      position:relative;
+    }
+    .brand{
+      font-family:'Special Elite', monospace;
+      font-size:44px;
+      letter-spacing:2px;
+      color:#f3efe9;
+      transform:translateY(4px);
+    }
+    .title{
+      font-family:'Special Elite', monospace;
+      font-size:18px;
+      font-weight:400;
+      color:#dcd7d7;
+      opacity:0.95;
+      margin-bottom:6px;
+      text-transform:none;
+    }
+    header::after{
+      content:"";
+      position:absolute;
+      left:-6px; right:-6px; top:56px;
+      height:36px;
+      background:linear-gradient(90deg, rgba(255,255,255,0.03), rgba(0,0,0,0.06));
+      transform:rotate(-1deg);
+      border-top:1px dashed rgba(255,255,255,0.03);
+      filter:contrast(.9);
+      z-index:-1;
+    }
+
+    .wrap{
+      max-width:1200px;
+      margin:0 auto;
+      padding:18px;
+      display:grid;
+      grid-template-columns: 1fr 340px;
+      gap:28px;
+      align-items:start;
+    }
+
+    .center{
+      background:rgba(10,10,10,0.6);
+      border:1px solid rgba(255,255,255,0.04);
+      backdrop-filter: blur(2px);
+      padding:22px;
+      border-radius:10px;
+      box-shadow:0 8px 30px rgba(0,0,0,0.7);
+    }
+
+    .cassette{
+      width:100%;
+      max-width:560px;
+      margin:0 auto;
+      position:relative;
+      border-radius:8px;
+      overflow:visible;
+      display:block;
+    }
+
+    #cassette-gif{
+      width:100%;
+      display:block;
+      border-radius:6px;
+      border:4px solid #111;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+    }
+
+    .album-cover{
+      position:absolute;
+      width:140px;
+      height:140px;
+      left:50%;
+      top:50%;
+      transform:translate(-50%,-50%);
+      border-radius:6px;
+      overflow:hidden;
+      border:3px solid rgba(0,0,0,0.6);
+      box-shadow:0 8px 18px rgba(0,0,0,0.6);
+      object-fit:cover;
+      background:#222;
+    }
+
+    .controls{
+      margin-top:16px;
+      display:flex;
+      align-items:center;
+      gap:12px;
+      justify-content:center;
+    }
+    .btn{
+      background:transparent;
+      border:1px solid rgba(255,255,255,0.06);
+      padding:10px 14px;
+      border-radius:6px;
+      cursor:pointer;
+      color:var(--muted);
+      font-weight:700;
+      font-family:'Special Elite', cursive;
+    }
+    .btn.play{
+      background:linear-gradient(90deg, rgba(200,75,49,0.12), rgba(200,75,49,0.06));
+      border-color:rgba(200,75,49,0.2);
+      color:#fff;
+    }
+    .progress{
+      flex:1;
+      height:8px;
+      background:rgba(255,255,255,0.04);
+      border-radius:6px;
+      overflow:hidden;
+      position:relative;
+      margin:0 12px;
+      align-self:center;
+      max-width:420px;
+    }
+    .progress .bar{height:100%;width:0%;background:linear-gradient(90deg,var(--accent),#f3a97b)}
+
+    .lyrics{
+      margin-top:20px;
+      background:rgba(0,0,0,0.55);
+      padding:16px;
+      border-radius:8px;
+      max-height:300px;
+      overflow:auto;
+      border:1px solid rgba(255,255,255,0.03);
+      color:#ddd;
+      font-family:'Merriweather', serif;
+      line-height:1.5;
+      white-space:pre-wrap;
+    }
+
+    .playlist{
+      margin-top:18px;
+    }
+    .track{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      padding:10px;
+      border-radius:6px;
+      border:1px solid rgba(255,255,255,0.02);
+      margin-bottom:8px;
+      cursor:pointer;
+      background:transparent;
+    }
+    .track:hover{background:rgba(255,255,255,0.02)}
+    .track .num{width:34px;text-align:center;color:var(--muted)}
+    .track .tmeta{flex:1;text-align:left}
+    .track .tmeta .tt{font-weight:700}
+    .track .tmeta .ta{font-size:13px;color:var(--muted)}
+
+    aside .notes{
+      background:var(--paper);
+      color:#111;
+      padding:18px;
+      border-radius:10px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.55);
+      height:520px;
+      overflow:auto;
+      position:sticky;
+      top:40px;
+      border:2px solid rgba(0,0,0,0.08);
+      background-image: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02)), var(--grain);
+      font-family:'Special Elite', cursive;
+      line-height:1.5;
+      white-space:pre-wrap;
+    }
+
+    footer{
+      margin-top:20px;
+      color:var(--muted);
+      font-size:13px;
+      text-align:center;
+      padding-top:10px;
+    }
+
+    @media (max-width:980px){
+      .wrap{grid-template-columns:1fr;padding:10px}
+      aside .notes{position:relative;height:320px}
+      .album-cover{width:120px;height:120px}
+      .cassette{max-width:100%}
+    }
+  </style>
+</head>
+<body>
+  <div class="overlay"></div>
+
+  <header>
+    <div class="brand">alvii</div>
+    <div>
+      <div class="title">mixtape</div>
+      <div style="color:var(--muted); font-size:13px; margin-top:6px">a grungy cassette, a folded note</div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <main class="center">
+      <div class="cassette">
+        <img id="cassette-gif" src="cassette.gif" alt="cassette loop gif">
+        <img id="album-cover" class="album-cover" src="placeholder_cover.jpg" alt="album cover">
+      </div>
+
+      <div class="controls">
+        <button class="btn" id="prevBtn">⏮</button>
+        <button class="btn play" id="playBtn">▶ Play</button>
+        <button class="btn" id="nextBtn">⏭</button>
+
+        <div class="progress" id="progress" title="Seek">
+          <div class="bar" id="progressBar"></div>
+        </div>
+
+        <div style="width:70px;text-align:right;color:var(--muted);font-size:13px" id="time">0:00</div>
+      </div>
+
+      <div class="lyrics" id="lyrics">
+        <pre id="lyricsText" style="margin:0;color:#ddd;white-space:pre-wrap;">Select a track to see lyrics.</pre>
+      </div>
+
+      <div class="playlist" id="playlist"></div>
+
+      <footer>
+        hope you like it fag
+      </footer>
+    </main>
+
+    <aside>
+      <div class="notes" id="notes">
+        <h3 style="margin-top:0;font-family:'Special Elite', cursive">alvii's notes</h3>
+        <div id="notesText">Select a song to reveal my notes for it. This is designed to look like a crumpled piece of paper. You can paste your thoughts for each track in the playlist data below.</div>
+      </div>
+    </aside>
+  </div>
+
+  <audio id="audio" preload="metadata"></audio>
+
+  <script>
+    /* ====== PLAYLIST LOGIC SAME AS BEFORE ====== */
+    const songs = [
+      {
+        title: "Track 1",
+        artist: "Unknown Artist",
+        file: "songs/01.mp3",
+        cover: "songs/covers/01.jpg",
+        lyrics: `Thinking ahead of time, why don't you spend the night?
+I know you love me
+Pick up and roll the dice, read in between the lines
+I know you love me
+We can book a flight, wake up in paradise
+Sun up above us
+Tell me you're down to ride, then you can bet your life
+No one above you
+Said hold on, can't stop (la-love)
+Said hold on, can't stop la-love (can't stop, yeah, yeah)
+Said hold on, can't stop la-love (everything yeah, yeah)
+Said hold on, can't stop
+And as long as you're with me, I'm definitely
+Yours for the taking, don't be mistaken
+And as long as you're with it, I'll be committed
+To you
+I'll show you what I know
+You'll give me what I need
+Not saying I'm a pro'
+But you'll could learn from me
+We go another round
+Before we fall asleep
+You got me on a cloud nine, baby
+Feels almost like a dream
+Something 'bout your body, yeah-eah (yeah, yeah)
+Said hold on, can't stop (la-love)
+I think you better hold on, can't stop la-love
+Said hold on, can't stop la-love
+I think you better hold on, can't stop (yeah, yeah, yeah)
+I think you better hold on, I'm not ready to go
+I hear you sayin', "Don't stop"
+I'd rather take it slow
+I see you tryna hold on
+But we aren't letting go
+You let me take control now
+You're ready to explode
+Yeah, hold...
+Said hold on, can't stop
+Said hold on, can't stop
+Said hold on, can't stop
+Said hold on, can't stop
+And when you're done, just say "enough" (enough)
+When your breath just can't keep up (keep up)
+'Cause it's bedtime, baby (yeah, yay)
+Yeah, hold...
+Said hold on, can't stop
+Said hold on, can't stop
+Said hold on, can't stop
+Said hold on, can't stop`,
+        notes: `this is the song i was listening to when i realized oh fuck. I am so cooked. I like her a lot more than i thought i would. i also really wanted to get- yk. withdrawls and shit. But this song made me think yk what, maybe i'll make a playlist for her.
+        I thought yeah nah she wont like this song, but fuck it. Its the song that started this playlist, and so it shall remain in this mixtape.`
+      },
+      // add more tracks here
+    ];
+
+    const audio = document.getElementById('audio');
+    const playBtn = document.getElementById('playBtn');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const playlistEl = document.getElementById('playlist');
+    const albumCover = document.getElementById('album-cover');
+    const lyricsText = document.getElementById('lyricsText');
+    const notesText = document.getElementById('notesText');
+    const progressBar = document.getElementById('progressBar');
+    const progress = document.getElementById('progress');
+    const timeEl = document.getElementById('time');
+
+    let currentIndex = 0;
+
+    function buildPlaylist(){
+      playlistEl.innerHTML = '';
+      songs.forEach((s,i)=>{
+        const t = document.createElement('div');
+        t.className='track';
+        if(!s.file){ t.style.opacity='0.45'; t.title='placeholder'; }
+        t.innerHTML=`<div class="num">${String(i+1).padStart(2,'0')}</div>
+                     <div class="tmeta"><div class="tt">${s.title||'Untitled'}</div>
+                     <div class="ta">${s.artist||''}</div></div>
+                     <div style="width:70px;text-align:right;color:var(--muted)">▶</div>`;
+        t.addEventListener('click',()=>{ if(!s.file) return; loadTrack(i); playAudio(); });
+        playlistEl.appendChild(t);
+      });
+    }
+
+    function loadTrack(i){
+      if(!songs[i] || !songs[i].file) return;
+      currentIndex=i;
+      audio.src=songs[i].file;
+      audio.load();
+      albumCover.src=songs[i].cover||'placeholder_cover.jpg';
+      lyricsText.textContent=songs[i].lyrics||'No lyrics.';
+      notesText.textContent=songs[i].notes||'No notes.';
+      highlightPlaying();
+    }
+
+    function highlightPlaying(){
+      document.querySelectorAll('.track').forEach((t,i)=>{ t.style.background=''; if(i===currentIndex) t.style.background='linear-gradient(90deg, rgba(200,75,49,0.08), rgba(0,0,0,0.04))'; });
+    }
+
+    function playAudio(){ if(audio.src) audio.play(); }
+    function pauseAudio(){ audio.pause(); }
+
+    playBtn.addEventListener('click',()=>{
+      if(!audio.src) loadTrack(0);
+      if(audio.paused) audio.play(); else audio.pause();
+    });
+
+    prevBtn.addEventListener('click',()=>{ skip(-1); });
+    nextBtn.addEventListener('click',()=>{ skip(1); });
+
+    function skip(dir){
+      let i=currentIndex; const len=songs.length;
+      for(let k=0;k<len;k++){
+        i=(i+dir+len)%len;
+        if(songs[i] && songs[i].file){ loadTrack(i); playAudio(); break; }
+      }
+    }
+
+    audio.addEventListener('play',()=>{ playBtn.textContent='❚❚ Pause'; });
+    audio.addEventListener('pause',()=>{ playBtn.textContent='▶ Play'; });
+    audio.addEventListener('ended',()=>{ skip(1); });
+
+    audio.addEventListener('timeupdate',()=>{
+      if(audio.duration){
+        const pct=(audio.currentTime/audio.duration)*100;
+        progressBar.style.width=pct+'%';
+        timeEl.textContent=formatTime(audio.currentTime)+' / '+formatTime(audio.duration);
+      }
+    });
+
+    function formatTime(sec){
+      if(!sec || isNaN(sec)) return '0:00';
+      const m=Math.floor(sec/60); const s=Math.floor(sec%60); return `${m}:${String(s).padStart(2,'0')}`;
+    }
+
+    progress.addEventListener('click',(e)=>{
+      if(!audio.duration) return;
+      const rect=progress.getBoundingClientRect();
+      audio.currentTime=((e.clientX-rect.left)/rect.width)*audio.duration;
+    });
+
+    buildPlaylist();
+  </script>
+</body>
+</html>
