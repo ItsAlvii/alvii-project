@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>alvii — mixtape</title>
+  <meta name="description" content="alvii — a grungy mixtape site" />
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Montserrat:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg-url: url("https://i.pinimg.com/736x/68/4f/5c/684f5cb69e56ab8b140e89dca9cdc730.jpg");
+      --accent: #c84b31;
+      --muted: #bdbdbd;
+      --paper: #f6f0e6;
+      --grain: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><filter id="n"><feTurbulence baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23n)" opacity="0.02" fill="black"/></svg>');
+    }
+    html,body{height:100%;margin:0;background:#0b0b0b;color:#eee;font-family:Montserrat, sans-serif}
+    body{
+      background-image: var(--bg-url);
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      position:relative;
+      overflow:auto;
+    }
+
+    /* overlay grunge */
+    .overlay{
+      position:fixed;inset:0;background:linear-gradient(180deg, rgba(0,0,0,0.55), rgba(0,0,0,0.7));pointer-events:none;mix-blend-mode:multiply;
+    }
+
+    .container{max-width:1200px;margin:40px auto;padding:24px;display:grid;grid-template-columns:1fr 360px;gap:28px;align-items:start}
+
+    /* cassette & center area */
+    .center{
+      background:rgba(10,10,10,0.6);border:1px solid rgba(255,255,255,0.04);backdrop-filter: blur(2px);padding:28px;border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,0.7);
+    }
+
+    .cassette-wrap{display:flex;gap:20px;align-items:flex-start}
+    .cassette{
+      width:420px;height:260px;position:relative;border-radius:8px;overflow:hidden;background:#171717;border:6px solid #222;box-shadow:inset 0 4px 10px rgba(0,0,0,0.7);
+      display:flex;align-items:center;justify-content:center
+    }
+
+    /* cassette gif - put a perfect looped gif named cassette.gif next to index.html or supply URL */
+    #cassette-gif{width:100%;height:100%;object-fit:cover;display:block}
+
+    /* album cover slot inside cassette */
+    .album-slot{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:150px;height:150px;border-radius:6px;overflow:hidden;box-shadow:0 6px 16px rgba(0,0,0,0.6);border:3px solid rgba(0,0,0,0.6)}
+    .album-slot img{width:100%;height:100%;object-fit:cover;display:block}
+
+    /* spin animation toggled by .playing */
+    .cassette.playing{animation:spin 3s linear infinite}
+    @keyframes spin{0%{transform:rotate(-1deg)}50%{transform:rotate(1deg)}100%{transform:rotate(-1deg)}}
+
+    /* controls */
+    .controls{margin-top:16px;display:flex;align-items:center;gap:12px}
+    .btn{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:10px 14px;border-radius:6px;cursor:pointer;color:var(--muted);font-weight:600}
+    .btn.play{background:linear-gradient(90deg, rgba(200,75,49,0.12), rgba(200,75,49,0.06));border-color:rgba(200,75,49,0.2);color:#fff}
+
+    .progress{flex:1;height:8px;background:rgba(255,255,255,0.04);border-radius:6px;overflow:hidden;position:relative}
+    .progress .bar{height:100%;width:0%;background:linear-gradient(90deg,var(--accent),#f3a97b)}
+
+    /* lyrics and notes */
+    .lyrics{margin-top:20px;background:rgba(0,0,0,0.55);padding:14px;border-radius:8px;max-height:220px;overflow:auto;border:1px solid rgba(255,255,255,0.03)}
+    .notes{background:var(--paper);color:#111;padding:18px;border-radius:10px;box-shadow: 0 8px 20px rgba(0,0,0,0.55);height:480px;overflow:auto;position:sticky;top:40px;border:2px solid rgba(0,0,0,0.08)}
+
+    /* crumpled paper look */
+    .notes{background-image: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02)), var(--grain);}
+
+    h1.title{font-family:Kalam, cursive;font-size:40px;margin:0 0 6px 0;letter-spacing:1px}
+    .meta{color:var(--muted);font-size:14px}
+
+    /* playlist */
+    .playlist{margin-top:20px}
+    .track{display:flex;gap:12px;align-items:center;padding:10px;border-radius:6px;border:1px solid rgba(255,255,255,0.02);margin-bottom:8px;cursor:pointer}
+    .track:hover{background:rgba(255,255,255,0.02)}
+    .track .num{width:28;text-align:center;color:var(--muted)}
+    .track .tmeta{flex:1}
+    .track .tmeta .tt{font-weight:700}
+    .track .tmeta .ta{font-size:13px;color:var(--muted)}
+
+    footer{margin-top:40px;color:var(--muted);font-size:13px;text-align:center}
+
+    /* responsive */
+    @media (max-width:980px){
+      .container{grid-template-columns:1fr;padding:18px}
+      .notes{position:relative;height:320px}
+      .cassette{width:100%;height:240px}
+      .album-slot{width:120px;height:120px}
+    }
+  </style>
+</head>
+<body>
+  <div class="overlay"></div>
+  <div class="container">
+    <main class="center">
+      <h1 class="title">alvii — mixtape</h1>
+      <div class="meta">a grungy mixtape for someone special — plays from local <code>/songs</code> folder</div>
+
+      <div class="cassette-wrap">
+        <div class="cassette" id="cassette">
+          <!-- Put a looped gif named cassette.gif next to this index.html or change the src to a URL -->
+          <img id="cassette-gif" src="cassette.gif" alt="cassette loop gif">
+
+          <div class="album-slot" id="album-slot">
+            <img src="placeholder_cover.jpg" id="album-cover" alt="album cover">
+          </div>
+        </div>
+
+        <div style="flex:1">
+          <div class="controls">
+            <button class="btn" id="prevBtn">⏮</button>
+            <button class="btn play" id="playBtn">▶ Play</button>
+            <button class="btn" id="nextBtn">⏭</button>
+
+            <div class="progress" id="progress" title="Seek">
+              <div class="bar" id="progressBar"></div>
+            </div>
+            <div style="width:60px;text-align:right;color:var(--muted);font-size:13px" id="time">0:00</div>
+          </div>
+
+          <div class="lyrics" id="lyrics">
+            <!-- Scrollable lyrics area -->
+            <pre id="lyricsText" style="white-space:pre-wrap;font-family:monospace;margin:0;color:#ddd">Select a track to see lyrics.</pre>
+          </div>
+
+          <div class="playlist" id="playlist"></div>
+        </div>
+      </div>
+
+      <footer>
+        hope you like it fag, this is so cringy lol
+      </footer>
+
+    </main>
+
+    <aside>
+      <div class="notes" id="notes">
+        <h3 style="margin-top:0;font-family:Kalam, cursive">alvii's notes</h3>
+        <div id="notesText">Select a song to reveal my notes for it. This is designed to look like a crumpled piece of paper. You can paste your thoughts for each track in the playlist data below.</div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Hidden audio element -->
+  <audio id="audio" preload="metadata"></audio>
+
+  <script>
+    /* ====== PLAYLIST DATA ======
+       Fill this array with your 27 tracks. Place the actual .mp3 files in /songs/ folder on S3.
+       For track 22 (index 21), leave file:null or skip it — I'll leave a placeholder for you as requested.
+    */
+
+    const songs = [
+      // Example entries — duplicate and edit to reach 27 tracks. Keep the filename relative to your site root (e.g. /songs/01 - song.mp3)
+      {title: "Track 1 - Example", artist: "Artist 1", file: "songs/01 - track1.mp3", cover: "songs/covers/01.jpg", lyrics: "Lyrics for track 1...\nLine 2", notes: "Note for track 1 — short, sweet."},
+      {title: "Track 2 - Example", artist: "Artist 2", file: "songs/02 - track2.mp3", cover: "songs/covers/02.jpg", lyrics: "Lyrics for track 2...", notes: "Note for track 2 — some thoughts."},
+      {title: "Track 3 - Example", artist: "Artist 3", file: "songs/03 - track3.mp3", cover: "songs/covers/03.jpg", lyrics: "Lyrics for track 3...", notes: "Note for track 3."},
+      {title: "Track 4 - Example", artist: "Artist 4", file: "songs/04 - track4.mp3", cover: "songs/covers/04.jpg", lyrics: "Lyrics for track 4...", notes: "Note for track 4."},
+
+      // ... add more until you have 27 total. Below is the placeholder for track 22 (index 21):
+      /* index 21 (track 22) reserved */
+      /* When you add the real tracks, keep the array order matching the playlist order you want */
+    ];
+
+    // If you want me to, I can pre-populate this array with the real Spotify playlist track names — tell me and I'll fetch them.
+
+    /* ====== UI / AUDIO LOGIC ====== */
+    const audio = document.getElementById('audio');
+    const playBtn = document.getElementById('playBtn');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const playlistEl = document.getElementById('playlist');
+    const albumCover = document.getElementById('album-cover');
+    const albumSlot = document.getElementById('album-slot');
+    const cassette = document.getElementById('cassette');
+    const lyricsText = document.getElementById('lyricsText');
+    const notesText = document.getElementById('notesText');
+    const progressBar = document.getElementById('progressBar');
+    const progress = document.getElementById('progress');
+    const timeEl = document.getElementById('time');
+
+    let currentIndex = 0;
+    let isPlaying = false;
+
+    function buildPlaylist(){
+      playlistEl.innerHTML = '';
+      songs.forEach((s, i)=>{
+        const t = document.createElement('div');
+        t.className = 'track';
+        // skip tracks without file
+        if(!s.file){
+          t.style.opacity = '0.45';
+          t.title = 'placeholder / reserved';
+        }
+        t.innerHTML = `<div class="num">${String(i+1).padStart(2,'0')}</div><div class="tmeta"><div class="tt">${s.title || 'Untitled'}</div><div class="ta">${s.artist || ''}</div></div><div style="width:70px;text-align:right;color:var(--muted)">▶</div>`;
+        t.addEventListener('click', ()=>{
+          if(!s.file) return alert('This track is reserved. Fill file path in the playlist array.');
+          loadTrack(i);playAudio();
+        });
+        playlistEl.appendChild(t);
+      });
+    }
+
+    function loadTrack(index){
+      if(!songs[index] || !songs[index].file){
+        console.warn('Track missing or reserved: ', index);return;
+      }
+      currentIndex = index;
+      audio.src = songs[index].file;
+      audio.load();
+      albumCover.src = songs[index].cover || 'placeholder_cover.jpg';
+      lyricsText.textContent = songs[index].lyrics || 'No lyrics provided.';
+      notesText.textContent = songs[index].notes || 'No notes for this track.';
+      highlightPlaying();
+    }
+
+    function highlightPlaying(){
+      const tracks = document.querySelectorAll('.track');
+      tracks.forEach((t, i)=>{t.style.background='';if(i===currentIndex) t.style.background='linear-gradient(90deg, rgba(200,75,49,0.08), rgba(0,0,0,0.04))';});
+    }
+
+    function playAudio(){
+      if(!audio.src) return;
+      audio.play();
+    }
+    function pauseAudio(){audio.pause();}
+
+    playBtn.addEventListener('click', ()=>{
+      if(!audio.src){ // if nothing loaded, try to load first available
+        const first = songs.findIndex(s=>s.file);
+        if(first===-1) return alert('No songs configured yet. Edit the songs array in the HTML.');
+        loadTrack(first);
+      }
+      if(audio.paused){audio.play();}else{audio.pause();}
+    });
+    prevBtn.addEventListener('click', ()=>{skip(-1)});
+    nextBtn.addEventListener('click', ()=>{skip(1)});
+
+    function skip(dir){
+      let i = currentIndex;
+      const len = songs.length;
+      for(let k=0;k<len;k++){
+        i = (i + dir + len) % len;
+        if(songs[i] && songs[i].file){ loadTrack(i); playAudio(); break; }
+      }
+    }
+
+    audio.addEventListener('play', ()=>{isPlaying=true; cassette.classList.add('playing'); playBtn.textContent='❚❚ Pause'});
+    audio.addEventListener('pause', ()=>{isPlaying=false; cassette.classList.remove('playing'); playBtn.textContent='▶ Play'});
+    audio.addEventListener('ended', ()=>{cassette.classList.remove('playing'); playBtn.textContent='▶ Play'; /* optionally auto-next */ skip(1);});
+
+    audio.addEventListener('timeupdate', ()=>{
+      if(audio.duration){
+        const pct = (audio.currentTime / audio.duration) * 100;
+        progressBar.style.width = pct + '%';
+        timeEl.textContent = formatTime(audio.currentTime) + ' / ' + formatTime(audio.duration);
+      }
+    });
+
+    function formatTime(sec){
+      if(!sec || isNaN(sec)) return '0:00';
+      const m = Math.floor(sec/60); const s = Math.floor(sec%60); return `${m}:${String(s).padStart(2,'0')}`;
+    }
+
+    // seek
+    progress.addEventListener('click', (e)=>{
+      if(!audio.duration) return;
+      const rect = progress.getBoundingClientRect();
+      const x = e.clientX - rect.left; const pct = x / rect.width; audio.currentTime = pct * audio.duration;
+    });
+
+    // build and try to auto-load first available song
+    buildPlaylist();
+    const first = songs.findIndex(s=>s.file);
+    if(first!==-1){ loadTrack(first); }
+
+    /* ====== Helpful notes for deployment (copy these to README) ======
+
+      - Static site hosting: upload index.html + cassette.gif + songs/ folder + songs/covers/ to an S3 bucket and enable static website hosting or use CloudFront in front of the bucket.
+      - Do NOT host audio assets on GitHub Pages if private — prefer S3 + CloudFront.
+      - To apply a "load balancer": static S3 sites don't use ALB; instead use CloudFront CDN in front of S3 for caching and distribution. For the API/backend, use an Application Load Balancer (ALB) pointing to ECS/EKS/EC2 instances.
+
+      - Simple GitHub Actions deploy to S3 (example workflow) is included below in an HTML comment.
+
+    ====== end notes ====== */
+  </script>
+
+  <!-- ====== Example GitHub Actions workflow for deploying static site to S3 ======
+
+  .github/workflows/deploy-static.yml
+  ----------------------------------
+  name: Deploy static site to S3
+
+  on:
+    push:
+      branches: [ main ]
+
+  permissions:
+    contents: read
+
+  jobs:
+    deploy:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v4
+        - uses: actions/setup-node@v4
+          with:
+            node-version: '18'
+        - name: Configure AWS credentials
+          uses: aws-actions/configure-aws-credentials@v2
+          with:
+            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            aws-region: us-east-1
+        - name: Sync to S3
+          run: |
+            aws s3 sync ./ s3://your-bucket-name --delete --acl public-read
+        - name: Invalidate CloudFront (optional)
+          run: |
+            aws cloudfront create-invalidation --distribution-id YOUR_DISTRIBUTION_ID --paths "/*"
+
+  Note: store your AWS credentials in GitHub Secrets. Adjust region/bucket/distribution ID.
+
+  ====== If you want a backend + RDS + load balancer (quick architecture notes) ======
+
+    - Backend: simple Node.js/Express or Python/Flask app running on ECS Fargate (or EC2 AutoScaling Group).
+    - Put the backend behind an Application Load Balancer (ALB) to distribute traffic and terminate TLS.
+    - Database: RDS (Postgres or MySQL). Backend connects to RDS inside private subnets.
+    - CI/CD: A second GitHub Actions workflow can build a Docker image, push to ECR, and update ECS service using aws ecs deploy patterns.
+
+  If you'd like, I can generate:
+    1) A starter Node.js Express backend (with endpoints: /api/playlist, /api/notes, /api/lyrics) + Dockerfile.
+    2) A GitHub Actions workflow that builds & pushes the Docker image to ECR and deploys to ECS with an ALB.
+    3) Infrastructure as Terraform or CloudFormation for VPC, subnets, ALB, ECS, RDS. (This is larger — I can do step-by-step.)
+
+  -->
+</body>
+</html>
+
+
